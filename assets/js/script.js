@@ -2,6 +2,8 @@
 var pageContentEl = document.querySelector("#page-content");
 var formEl = document.querySelector("#task-form");
 var tasksToDoEl = document.querySelector("#tasks-to-do");
+var tasksInProgressEl = document.querySelector("#tasks-in-progress");
+var tasksCompletedEl = document.querySelector("#tasks-completed");
 var taskIdCounter = 0;
 
 // Create new task helper method
@@ -140,6 +142,25 @@ var taskButtonHandler = function(event) {
     }
 };
 
+// Functionality to process a change in the status selection
+var taskStatusChangeHandler = function(event) {
+    var targetEl = event.target;
+    var taskId = targetEl.getAttribute("data-task-id");
+    var statusValue = targetEl.value.toLowerCase();
+    var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+
+    // Move the task into the appropriate column
+    if(statusValue === "to do") {
+        tasksToDoEl.appendChild(taskSelected);
+    }
+    else if(statusValue === "in progress") {
+        tasksInProgressEl.appendChild(taskSelected);
+    }
+    else if(statusValue === "completed") {
+        tasksCompletedEl.appendChild(taskSelected);
+    }
+};
+
 // Method to delete a task
 var deleteTask = function(taskId) {
     var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
@@ -168,5 +189,8 @@ var editTask = function(taskId) {
 // Event listener to add a new item by submitting the form
 formEl.addEventListener("submit", taskFormHandler);
 
-// Event listener for delete element on a task item
+// Event listener for delete and edit elements on a task item
 pageContentEl.addEventListener("click", taskButtonHandler);
+
+// Event listener for text status change
+pageContentEl.addEventListener("change", taskStatusChangeHandler);
