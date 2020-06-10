@@ -1,4 +1,5 @@
 // Global variables
+var pageContentEl = document.querySelector("#page-content");
 var formEl = document.querySelector("#task-form");
 var tasksToDoEl = document.querySelector("#tasks-to-do");
 var taskIdCounter = 0;
@@ -28,7 +29,7 @@ var taskFormHandler = function(event) {
     };
 
     createTaskEl(taskDataObj);
-}
+};
 
 // Builds the new task item and adds it to the list
 var createTaskEl = function(taskDataObj) {
@@ -55,12 +56,10 @@ var createTaskEl = function(taskDataObj) {
 
     // Increment task ID counter
     taskIdCounter++;
-}
+};
 
 // Adds buttons to the task item
 var createTaskActions = function(taskId) {
-
-    debugger;
 
     // Create a div to hold all the buttons; call the div actionContainerEl
     var actionContainerEl = document.createElement("div");
@@ -96,7 +95,31 @@ var createTaskActions = function(taskId) {
     actionContainerEl.appendChild(statusSelectEl);
 
     return actionContainerEl;
-}
+};
 
-// Add a new item to the To-Do List by clicking the button
+// Functionality to process button clicks on a list item
+var taskButtonHandler = function(event) {
+
+    // Actions if delete button is clicked
+    if(event.target.matches(".delete-btn")) {
+        var taskId = event.target.getAttribute("data-task-id");
+        deleteTask(taskId);
+    }
+
+    // Actions if edit button is clicked
+    if(event.target.matches(".edit-btn")) {
+        console.log("edit button click");
+    }
+};
+
+// Method to delete a task
+var deleteTask = function(taskId) {
+    var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+    taskSelected.remove();
+};
+
+// Event listener to add a new item by submitting the form
 formEl.addEventListener("submit", taskFormHandler);
+
+// Event listener for delete element on a task item
+pageContentEl.addEventListener("click", taskButtonHandler);
