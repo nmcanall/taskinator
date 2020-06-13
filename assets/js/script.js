@@ -283,6 +283,59 @@ var saveTasks = function() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+// Function to load the state of the tasks array on screen refresh/load
+var loadTasks = function() {
+    // Get the data from local storage
+    tasks = localStorage.getItem("tasks");
+
+    // Convert the JSON stringify type back into an array of objects
+    if(!tasks) {
+        tasks = [];
+        return false;
+    }
+    tasks = JSON.parse(tasks);
+    console.log(tasks);
+
+    // Rebuild the page with the new tasks array
+    for(var i = 0; i < tasks.length; i++) {
+        tasks[i].id = taskIdCounter;
+
+        // Add the new list item
+        var listItemEl = document.createElement("li");
+        listItemEl.className = "task-item";
+        listItemEl.setAttribute("data-task-id", tasks[i].id);
+        listItemEl.setAttribute("draggable", "true");
+
+        // Create div to hold task info and add to list item
+        var taskInfoEl = document.createElement("div");
+        taskInfoEl.className = "task-info";
+        taskInfoEl.innerHTML = "<h3 class='task-name'>" + tasks[i].name + "</h3><span class='task-type'>" + tasks[i].type + "</span>"
+
+        // Add the list item to the list info
+        listItemEl.appendChild(taskInfoEl);
+
+        // Add tasks action buttons to the listItemEl
+        var taskActionsEl = createTaskActions(tasks[i].id);
+        listItemEl.appendChild(taskActionsEl);
+
+        // Add the item to the correct list
+        if(tasks[i].status === "to do") {
+            listItemEl.querySelector("select[name='status-change']").selectedIndex = 0;
+            tasksToDoEl.appendChild(listItemEl);
+        }
+        else if(tasks[i].status === "in progress") {
+            listItemEl.querySelector("select[name='status-change']").selectedIndex = 1;
+            tasksInProgressEl.appendChild(listItemEl);
+        }
+        else if(tasks[i].status === "complete") {
+            listItemEl.querySelector("select[name='status-change']").selectedIndex = 2;
+            tasksCompletedEl.appendChild(listItemEl);
+        }
+        taskIdCounter++;
+        console.log(listItemEl);
+    }
+};
+
 // Event listener to add a new item by submitting the form
 formEl.addEventListener("submit", taskFormHandler);
 
@@ -303,3 +356,6 @@ pageContentEl.addEventListener("drop", dropTaskHandler);
 
 // Leave event listener to apply to "main" tag
 pageContentEl.addEventListener("dragleave", dragLeaveHandler);
+
+// Load the current status of the page
+loadTasks();
