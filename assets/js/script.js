@@ -71,6 +71,7 @@ var createTaskEl = function(taskDataObj) {
     // Add data object into the list array
     taskDataObj.id = taskIdCounter;
     tasks.push(taskDataObj);
+    saveTasks();
 
     // Put list into Tasks To Do
     tasksToDoEl.appendChild(listItemEl);
@@ -96,6 +97,7 @@ var completeEditTask = function(taskName, taskType, taskId) {
             tasks[i].type = taskType;
         }
     }
+    saveTasks();
 
     // Reset the form
     formEl.removeAttribute("data-task-id");
@@ -181,6 +183,7 @@ var taskStatusChangeHandler = function(event) {
             tasks[i].status = statusValue;
         }
     }
+    saveTasks();
 };
 
 // Method to delete a task
@@ -196,6 +199,7 @@ var deleteTask = function(taskId) {
         }
     }
     tasks = updatedTasks;
+    saveTasks();
 };
 
 // Method to edit a task
@@ -263,6 +267,7 @@ var dropTaskHandler = function(event) {
             tasks[i].status = statusSelectEl.value.toLowerCase();
         }
     }
+    saveTasks();
 };
 
 // Helper method to remove styling from the list when you drag-leave that list
@@ -271,6 +276,11 @@ var dragLeaveHandler = function(event) {
     if(hoverZoneEl) {
         hoverZoneEl.removeAttribute("style");  
     }
+};
+
+// Function to save the state of the tasks array
+var saveTasks = function() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
 // Event listener to add a new item by submitting the form
