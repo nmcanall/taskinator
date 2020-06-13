@@ -52,6 +52,7 @@ var createTaskEl = function(taskDataObj) {
     var listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
     listItemEl.setAttribute("data-task-id", taskIdCounter);
+    listItemEl.setAttribute("draggable", "true");
 
     // Create div to hold task info and add to list item
     var taskInfoEl = document.createElement("div");
@@ -186,6 +187,55 @@ var editTask = function(taskId) {
     formEl.setAttribute("data-task-id", taskId);
 };
 
+// Method to create drag effect
+var dragTaskHandler = function(event) {
+    var taskId = event.target.getAttribute("data-task-id");
+    event.dataTransfer.setData("text/plain", taskId);
+};
+
+// Method to create drag-over effect
+var dropZoneDragHandler = function(event) {
+    var taskListEl = event.target.closest(".task-list");
+    if(taskListEl) {
+        event.preventDefault();
+        taskListEl.setAttribute("style", "background: rgba(68, 233, 255, 0.7); border-style: dashed;");
+    }
+};
+
+// Method to create a drop effect
+var dropTaskHandler = function(event) {
+    var id = event.dataTransfer.getData("text/plain");
+    var draggableElement = document.querySelector("[data-task-id='" + id + "']");
+    var dropZoneEl = event.target.closest(".task-list");
+    var statusType = dropZoneEl.id;
+    var statusSelectEl = draggableElement.querySelector("select[name='status-change']");
+
+    // Determine which list the item was dropped to 
+    if(statusType === "tasks-to-do") {
+        statusSelectEl.selectedIndex = 0;
+    }
+    else if(statusType === "tasks-in-progress") {
+        statusSelectEl.selectedIndex = 1;
+    }
+    else if(statusType === "tasks-completed") {
+        statusSelectEl.selectedIndex = 2;
+    }
+
+    // Remove styling to the potential items to drop into
+    dropZoneEl.removeAttribute("style");
+
+    // Add element to the new list
+    dropZoneEl.appendChild(draggableElement);
+};
+
+// Helper method to remove styling from the list when you drag-leave that list
+var dragLeaveHandler = function(event) {
+    var hoverZoneEl = event.target.closest(".task-list");
+    if(hoverZoneEl) {
+        hoverZoneEl.removeAttribute("style");  
+    }
+};
+
 // Event listener to add a new item by submitting the form
 formEl.addEventListener("submit", taskFormHandler);
 
@@ -194,3 +244,15 @@ pageContentEl.addEventListener("click", taskButtonHandler);
 
 // Event listener for text status change
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
+
+// DragStart listner applied to the entire "main" tag
+pageContentEl.addEventListener("dragstart", dragTaskHandler);
+
+// DragOver listner applied to the entire "main" tag
+pageContentEl.addEventListener("dragover", dropZoneDragHandler);
+
+// Drop listner applied to the entire "main" tag
+pageContentEl.addEventListener("drop", dropTaskHandler);
+
+// Leave event listener to apply to "main" tag
+pageContentEl.addEventListener("dragleave", dragLeaveHandler);
